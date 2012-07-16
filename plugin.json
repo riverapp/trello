@@ -1,3 +1,16 @@
 {
-	"name": "Facebook"
+	"name": 				"Facebook",
+	"identifier":		"me.danpalmer.River.plugins.Facebook",
+	"developer": {
+		"name":				"Dan Palmer",
+		"email":			"dan.palmer@me.com",
+		"website":		"http://danpalmer.me/River/Facebook"
+	},
+	"icons": {
+		"small":			"icons/facebook16.png",
+		"large":			"icons/facebook32.png"
+	},
+	"providers": {
+		"stream": "FacebookStreamProvider"
+	}
 }
