@@ -19,5 +19,13 @@
 		};
 	};
 
+	FacebookStreamProvider.prototype.authenticate = function(params) {
+		R.createAccount({
+			name: params.email,
+			secret: params.password,
+			identifier: params.email
+		});
+	};
+
 	return new FacebookStreamProvider();
 })
