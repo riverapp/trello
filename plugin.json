@@ -1,16 +1,18 @@
 {
-	"name": 				"Facebook",
-	"identifier":		"me.danpalmer.River.plugins.Facebook",
+	"name": 				"Trello",
+	"identifier":		"me.danpalmer.River.plugins.Trello",
+	"description":  "Get notified about changes being made to boards and cards on Trello.",
+	"titleImage":   "trello.png",
 	"developer": {
 		"name":				"Dan Palmer",
 		"email":			"dan.palmer@me.com",
-		"website":		"http://danpalmer.me/River/Facebook"
+		"website":		"http://danpalmer.me/River/Trello"
 	},
 	"icons": {
-		"small":			"icons/facebook16.png",
-		"large":			"icons/facebook32.png"
+		"small":			"icons/trello16.png",
+		"large":			"icons/trello32.png"
 	},
 	"providers": {
-		"stream": "FacebookStreamProvider"
+		"stream": "Trello.js"
 	}
 }
