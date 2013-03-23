@@ -196,7 +196,7 @@
 		// addMemberToCard : 'added a member to a card',
 		// addMemberToOrganization : 'added a member to an organisation',
 		// addToOrganizationBoard : 'added you to an organisation',
-		commentCard : '<b><%= memberCreator.fullName %></b> commented on <b><%= data.card.name %></b>: <i><%= data.text %></i>',
+		commentCard : '<b><%= memberCreator.fullName %></b> commented on <b><%= data.card.name %></b>: <br/><%= data.text %>',
 		// copyCommentCard : 'copied a comment from a card',
 		// convertToCardFromCheckItem : 'created a card from a checklist item',
 		// copyBoard : 'copied a board',
