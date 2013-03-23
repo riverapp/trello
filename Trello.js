@@ -68,6 +68,9 @@
 	Trello.prototype.authenticate = function(params) {
 		var self = this;
 
+		console.log('Authenticating...');
+		console.log(params);
+
 		// Swap the request token we have for an access token.
 		self.accessToken(params, function(err, response) {
 			if (err) {
@@ -75,9 +78,11 @@
 				return;
 			}
 
+			console.log('Got access token');
+
 			// Parse the details we get back, containing the access token.
 			var auth = parseQueryString(response);
-
+			console.log(auth);
 			// Before we create a user, get some more information about the user who
 			// has authenticated so that we can fill out the account object.
 			// *Note: Trello uses 'me' to signify the current user's account ID.*
@@ -86,6 +91,7 @@
 					console.log(err);
 					return;
 				}
+				console.log('Got user details: ' + userDetails);
 				userDetails = JSON.parse(userDetails);
 				self.delegate.createAccount({
 					name: userDetails.fullName,
@@ -100,7 +106,8 @@
 	// Helper method to swap the request token in *params* for an access token.
 	Trello.prototype.accessToken = function(params, callback) {
 		// Retreive that secret we stored earlier in the persistence object.
-		var oauth_token_secret = self.delegate.persistence.get('secret');
+		var oauth_token_secret = this.delegate.persistence.get('secret');
+		console.log('token secret: ' + oauth_token_secret);
 		HTTP.request({
 			url: this.oauth_access_token_url,
 			method: 'POST',
@@ -147,9 +154,14 @@
 			var processed = [];
 			for (var i = 0; i < notifications.length; i++) {
 				var s = new Notification();
-				s.action = self.template(notifications[i].type, notifications[i].data);
-				s.subject = notifications[i].memberCreator.fullName;
+				if (Trello.stringLookup[notifications[i].type] === undefined) {
+					console.log(notifications[i].type);
+					console.log(notifications[i]);
+					continue;
+				}
+				s.text = _.template(Trello.stringLookup[notifications[i].type], notifications[i]);
 				s.id = notifications[i].id;
+				s.notification = s.text;
 				processed.push(s);
 			}
 			callback(null, processed);
@@ -162,11 +174,6 @@
 			method: 'GET',
 			url: this.notifications_url + JSON.parse(user.secret).oauth_token_secret
 		}, callback);
-	};
-
-	// Helper method to apply a template to some data returned from the API.
-	Trello.prototype.template = function(key) {
-		return _.template.bind(_, Trello.stringLookup[key]);
 	};
 
 	// Called by River to determine how often it should update streams from this
@@ -183,44 +190,44 @@
 	// bunch of templates for how to format each type of message. These use
 	// Underscore.js templating, which is similar to ERB or JSP.
 	Trello.stringLookup = {
-		addAttachmentToCard : 'added an attachment to a card',
-		addChecklistToCard : 'added a checklist to a card',
-		addMemberToBoard : 'added a member to a board',
-		addMemberToCard : 'added a member to a card',
-		addMemberToOrganization : 'added a member to an organisation',
-		addToOrganizationBoard : 'added you to an organisation',
-		commentCard : 'commented on a card',
-		copyCommentCard : 'copied a comment from a card',
-		convertToCardFromCheckItem : 'created a card from a checklist item',
-		copyBoard : 'copied a board',
-		createBoard : 'created a board',
-		createCard : 'created a card',
-		copyCard : 'copied a card',
-		createList : 'created a list',
-		createOrganization : 'created an organisation',
-		deleteAttachmentFromCard : 'deleted an attachment from a card',
-		deleteBoardInvitation : 'deleted a board invitation',
-		deleteOrganizationInvitation : 'deleted an organisation invitation',
-		makeAdminOfBoard : 'was made the admin of <%= board.name %>',
-		makeNormalMemberOfBoard : 'made you a normal member of a board',
-		makeNormalMemberOfOrganization : 'made you a normal member of an organisation',
-		makeObserverOfBoard : 'made you an observer of a board',
-		memberJoinedTrello : 'joined Trello',
-		moveCardFromBoard : 'moved card from a board',
-		moveListFromBoard : 'moved list from a board',
-		moveCardToBoard : '',
-		moveListToBoard : '',
-		removeAdminFromBoard : '',
-		removeAdminFromOrganization : '',
-		removeChecklistFromCard : '',
-		removeFromOrganizationBoard : '',
-		removeMemberFromCard : '',
-		updateBoard : '',
-		updateCard : '',
-		updateCheckItemStateOnCard : '',
-		updateChecklist : '',
-		updateMember : '',
-		updateOrganization : 'updated an organisation'
+		// addAttachmentToCard : 'added an attachment to a card',
+		// addChecklistToCard : 'added a checklist to a card',
+		addMemberToBoard : '<b><%= memberCreator.fullName %></b> added <b><%= memberAdded.fullName %></b> to <b><%= data.board.name %></b>',
+		// addMemberToCard : 'added a member to a card',
+		// addMemberToOrganization : 'added a member to an organisation',
+		// addToOrganizationBoard : 'added you to an organisation',
+		commentCard : '<b><%= memberCreator.fullName %></b> commented on <b><%= data.card.name %></b>: <i><%= data.text %></i>',
+		// copyCommentCard : 'copied a comment from a card',
+		// convertToCardFromCheckItem : 'created a card from a checklist item',
+		// copyBoard : 'copied a board',
+		// createBoard : 'created a board',
+		createdCard : '<b><%= memberCreator.fullName %></b> added <b><%= data.card.name %></b> to <b><%= data.list.name %></b>',
+		// copyCard : 'copied a card',
+		// createList : 'created a list',
+		// createOrganization : 'created an organisation',
+		// deleteAttachmentFromCard : 'deleted an attachment from a card',
+		// deleteBoardInvitation : 'deleted a board invitation',
+		// deleteOrganizationInvitation : 'deleted an organisation invitation',
+		// makeAdminOfBoard : 'was made the admin of <%= data.board.name %>',
+		// makeNormalMemberOfBoard : 'made you a normal member of a board',
+		// makeNormalMemberOfOrganization : 'made you a normal member of an organisation',
+		// makeObserverOfBoard : 'made you an observer of a board',
+		// memberJoinedTrello : 'joined Trello',
+		// moveCardFromBoard : 'moved card from a board',
+		// moveListFromBoard : 'moved list from a board',
+		// moveCardToBoard : '',
+		// moveListToBoard : '',
+		// removeAdminFromBoard : '',
+		// removeAdminFromOrganization : '',
+		// removeChecklistFromCard : '',
+		// removeFromOrganizationBoard : '',
+		// removeMemberFromCard : '',
+		// updateBoard : '',
+		// updateCard : '',
+		updateCheckItemStateOnCard : '<b><%= memberCreator.fullName %></b> marked <b><%= data.name %></b> as <b><%= data.state %></b>'
+		// updateChecklist : '',
+		// updateMember : '',
+		// updateOrganization : 'updated an organisation'
 	};
 
 	// Must register the 'class' with the **PluginManager** with the identifier
