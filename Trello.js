@@ -68,9 +68,6 @@
 	Trello.prototype.authenticate = function(params) {
 		var self = this;
 
-		console.log('Authenticating...');
-		console.log(params);
-
 		// Swap the request token we have for an access token.
 		self.accessToken(params, function(err, response) {
 			if (err) {
@@ -78,11 +75,8 @@
 				return;
 			}
 
-			console.log('Got access token');
-
 			// Parse the details we get back, containing the access token.
 			var auth = parseQueryString(response);
-			console.log(auth);
 			// Before we create a user, get some more information about the user who
 			// has authenticated so that we can fill out the account object.
 			// *Note: Trello uses 'me' to signify the current user's account ID.*
@@ -91,13 +85,11 @@
 					console.log(err);
 					return;
 				}
-				console.log('Got user details: ' + userDetails);
 				userDetails = JSON.parse(userDetails);
 				self.delegate.createAccount({
 					name: userDetails.fullName,
 					identifier: userDetails.id,
-					secret: JSON.stringify(auth),
-					avatarURL: 'https://trello-avatars.s3.amazonaws.com/' + userDetails.avatar_hash + '/170.png'
+					secret: JSON.stringify(auth)
 				});
 			});
 		});
