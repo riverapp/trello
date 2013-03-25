@@ -145,7 +145,7 @@
 			var notifications = JSON.parse(response);
 			var processed = [];
 			for (var i = 0; i < notifications.length; i++) {
-				var s = new Notification();
+				var s = new Text();
 				if (Trello.stringLookup[notifications[i].type] === undefined) {
 					console.log(notifications[i].type);
 					console.log(notifications[i]);
